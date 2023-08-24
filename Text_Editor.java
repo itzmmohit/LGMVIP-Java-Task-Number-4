@@ -1,8 +1,11 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Desktop;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.print.PrinterException;
+import java.awt.print.PrinterJob;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -40,6 +43,9 @@ public class Text_Editor extends JFrame implements ActionListener {
     private JMenuItem replaceMenuItem;
     private JSeparator separator_1;
     private JScrollPane scrollPane;
+    private JMenuItem printMenuItem;
+    private JSeparator separator_2;
+
 
     public static void main(String[] args) {
         EventQueue.invokeLater(() -> {
@@ -79,6 +85,12 @@ public class Text_Editor extends JFrame implements ActionListener {
 
         saveAsMenuItem = new JMenuItem("Save As");
         fileMenu.add(saveAsMenuItem);
+        
+        separator_2 = new JSeparator();
+        fileMenu.add(separator_2);
+        
+        printMenuItem = new JMenuItem("Print");
+        fileMenu.add(printMenuItem);
 
         fileMenu.addSeparator();
 
@@ -148,6 +160,7 @@ public class Text_Editor extends JFrame implements ActionListener {
         textHighlightMenuItem.addActionListener(this);
         findMenuItem.addActionListener(this);
         replaceMenuItem.addActionListener(this);
+        printMenuItem.addActionListener(this);
         
     }
 
@@ -161,6 +174,8 @@ public class Text_Editor extends JFrame implements ActionListener {
             saveFile();
         } else if (e.getSource() == saveAsMenuItem) {
             saveFileAs();
+        } else if (e.getSource() == printMenuItem) {
+            printText();
         } else if (e.getSource() == exitMenuItem) {
             System.exit(0);
         } else if (e.getSource() == cutMenuItem) {
@@ -282,6 +297,19 @@ public class Text_Editor extends JFrame implements ActionListener {
                 String content = textArea.getText();
                 content = content.replace(searchText, replaceText);
                 textArea.setText(content);
+            }
+        }
+    }
+    
+    private void printText() {
+        PrinterJob printerJob = PrinterJob.getPrinterJob();
+        if (printerJob.printDialog()) {
+            printerJob.setPrintable(textArea.getPrintable(null, null));
+            try {
+                printerJob.print();
+            } catch (PrinterException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Error while printing", "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
